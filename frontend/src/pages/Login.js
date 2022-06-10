@@ -4,7 +4,11 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import Icon from "../components/Icon";
 import Tilt from "react-parallax-tilt";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../features/Auth/authSlice";
 
 const Login = () => {
   const facebookBackground =
@@ -16,22 +20,73 @@ const Login = () => {
   const twitterBackground =
     "linear-gradient(to right, #56C1E1 0%, #35A9CE 50%)";
 
+  const emailRef = useRef();
+  const passwordRef = useRef();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const auth = useSelector((state) => state?.auth);
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const redirectPath = location.state?.path || "/";
+
+  const notify = (message = "Login Successful", error = false) => {
+    if (error) {
+      console.log(message);
+      return toast.error(message, {
+        position: "top-center",
+        autoClose: 500,
+      });
+    }
+    return toast.success(message, {
+      position: "bottom-center",
+      autoClose: 500,
+    });
+  };
 
   const handleClick = () => {
     navigate("/register");
   };
 
+  const loginHandler = () => {
+    console.log("got here");
+    if (!passwordRef.current?.value || !emailRef.current?.value) {
+      return notify("Provide All Info", true);
+    }
+
+    const user = {
+      email: emailRef.current?.value,
+      password: passwordRef.current?.value,
+    };
+
+    dispatch(login(user));
+
+    console.log("now auth", auth);
+
+    setIsLoggedIn(true);
+
+    // window.location.reload();
+    navigate("/profile", { replace: true });
+  };
+
+  // useEffect(() => {
+  //   navigate("/profile", { replace: true });
+  // }, [isLoggedIn]);
+
   return (
     <Tilt>
+      <ToastContainer style={{ height: "30px", width: "30%" }}></ToastContainer>
       <MainContainer>
         <WelcomeText>Welcome</WelcomeText>
         <InputContainer>
-          <Input type="text" placeholder="Email" />
-          <Input type="password" placeholder="Password" />
+          <Input refer={emailRef} type="text" placeholder="Email" />
+          <Input refer={passwordRef} type="password" placeholder="Password" />
         </InputContainer>
         <ButtonContainer>
-          <Button content="Sign Up" />
+          <Button handleClick={loginHandler} content="Log In"></Button>
         </ButtonContainer>
         <LoginWith>or Login With</LoginWith>
         <HorizontalRule />
@@ -62,7 +117,7 @@ const MainContainer = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  height: 90vh;
+  height: 100vh;
   width: 30vw;
   background: rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);

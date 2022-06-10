@@ -3,26 +3,67 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import Tilt from "react-parallax-tilt";
 import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../features/Auth/authSlice";
 
 const Register = () => {
   const navigate = useNavigate();
+  const auth = useSelector((state) => state?.auth);
+  const dispatch = useDispatch();
+
+  const nameRef = useRef();
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const passwordAgainRef = useRef();
 
   const handleClick = () => {
-    navigate("/register");
+    navigate("/login");
   };
+
+  const notify = (message = "Login Successful", error = false) => {
+    toast(message, { position: "bottom-center" });
+  };
+
+  // const registerUser = (user) => {
+  //   return axios.post("/user/register", user);
+  // };
+
+  const registerHandler = () => {
+    if (passwordRef.current?.value !== passwordAgainRef.current?.value) {
+      notify("Passwords Must Match", true);
+    }
+
+    const user = {
+      name: nameRef.current?.value,
+      email: emailRef.current?.value,
+      password: passwordRef.current?.value,
+    };
+
+    dispatch(register(user));
+
+    navigate("/login", { replace: true });
+  };
+
+  console.log("auth in register : ", auth);
 
   return (
     <Tilt>
       <MainContainer>
         <WelcomeText>Create New Account</WelcomeText>
         <InputContainer>
-          <Input type="text" placeholder="Name" />
-          <Input type="text" placeholder="Email" />
-          <Input type="password" placeholder="Password" />
-          <Input type="password" placeholder="Password Again" />
+          <Input type="text" placeholder="Name" refer={nameRef} />
+          <Input type="text" placeholder="Email" refer={emailRef} />
+          <Input type="password" placeholder="Password" refer={passwordRef} />
+          <Input
+            type="password"
+            placeholder="Password Again"
+            refer={passwordAgainRef}
+          />
         </InputContainer>
         <ButtonContainer>
-          <Button content="Sign In" />
+          <Button handleClick={registerHandler} content="Sign Up"></Button>
         </ButtonContainer>
         <HorizontalRule />
 
@@ -32,6 +73,7 @@ const Register = () => {
           Sign In
         </ForgotPassword>
       </MainContainer>
+      <ToastContainer />
     </Tilt>
   );
 };

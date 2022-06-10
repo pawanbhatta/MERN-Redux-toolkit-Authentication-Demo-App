@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
-const Input = ({ type, placeholder }) => {
-  return <StyledInput type={type} placeholder={placeholder} />;
+const Input = ({ type, placeholder, refer }) => {
+  return <StyledInput ref={refer} type={type} placeholder={placeholder} />;
 };
 
 const StyledInput = styled.input`

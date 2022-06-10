@@ -45,16 +45,22 @@ router.post("/login", async (req, res) => {
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  // Check if user exists
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email doesn't exist");
+  try {
+    // Check if user exists
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(400).send("Email doesn't exist");
 
-  // Check if password is correct
-  const checkPass = await bcrypt.compare(req.body.password, user.password);
-  if (!checkPass) return res.status(400).send("Password didn't match");
+    // Check if password is correct
+    const checkPass = await bcrypt.compare(req.body.password, user.password);
+    if (!checkPass) return res.status(400).send("Password didn't match");
 
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-  res.header("auth-token", token).send(token);
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    const { name, email } = user;
+    // res.header("auth-token", token).send(token);
+    res.status(200).json({ name, email, token });
+  } catch (error) {
+    throw new Error(error);
+  }
 });
 
 module.exports = router;

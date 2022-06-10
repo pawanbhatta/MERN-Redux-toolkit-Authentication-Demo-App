@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
-const Button = ({ content }) => {
-  return <StyledButton>{content}</StyledButton>;
+const Button = ({ content, handleClick }) => {
+  return <StyledButton onClick={handleClick}>{content}</StyledButton>;
 };
 
 const StyledButton = styled.button`
@@ -17,3 +17,19 @@ const StyledButton = styled.button`
 `;
 
 export default Button;
+
+// Admin:
+// username - admin33
+// pswd - Asdf@123
+
+// User:
+// username - user44
+// pswd - Asdf@123
+
+// Parent:
+// username - parent
+// pswd - Asdf@123
+
+// Teacher:
+// username - teacher
+// pswd - Asdf@123
